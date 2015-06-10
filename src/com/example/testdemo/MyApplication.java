@@ -1,6 +1,7 @@
 package com.example.testdemo;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
@@ -12,6 +13,8 @@ public class MyApplication extends Application {
 	private LruImageCache mLruImageCache;
 	private ImageLoader mImageLoader;
 	
+	int x = 10;
+	
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
@@ -20,6 +23,9 @@ public class MyApplication extends Application {
 		mQueue = Volley.newRequestQueue(this);
 		mLruImageCache = LruImageCache.instance();
 		mImageLoader = new ImageLoader(mQueue, LruImageCache.instance());
+		
+		Log.d("yanjun","MyApplication onCreate x=" + x + this);
+		x = 100;
 	}
 
 	public ImageLoader getImageLoader() {

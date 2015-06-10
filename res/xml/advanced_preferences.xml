@@ -1,0 +1,19 @@
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:title="AAAAA">
+
+        <CheckBoxPreference
+                android:key="checkbox_preference"
+                android:title="Test"
+                android:summary="Test haha " />
+        
+        <SwitchPreference  android:key="switch_preference"
+                android:title="Test"
+                android:summary="Test haha " />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>
