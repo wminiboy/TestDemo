@@ -15,11 +15,28 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="slidingButtonStyle">@style/SlidingButton</item>
     </style>
 
-    <!--         <item name="android:windowNoTitle">true</item>  -->
+    <!-- <item name="android:windowNoTitle">true</item>  -->
     <style name="Theme.NoBackground" parent="AppBaseTheme">
         <item name="android:windowBackground">@null</item>
     </style>
 
+	<!-- Default SlidingButton style -->
+    <style name="SlidingButton" parent="@android:style/Widget">
+        <item name="backgroundOff">@drawable/sn_btn_switch_off_normal_holo_light</item>
+        <item name="backgroundOffDisable">@drawable/sn_btn_switch_off_disabled_holo_light</item>
+        <item name="backgroundOn">@drawable/sn_btn_switch_on_normal_holo_light</item>
+        <item name="backgroundOnDisable">@drawable/sn_btn_switch_waiting_holo_light</item>
+        <item name="buttonOff">@drawable/sn_switch_off_slider</item>
+        <item name="buttonOffDisable">@drawable/sn_switch_disable_slider</item>
+        <item name="buttonOn">@drawable/sn_switch_on_slider</item>
+        <item name="buttonOnDisable">@drawable/sn_switch_on_disable_slider</item>
+    </style>
+    
+    <style name="FullScreenTheme" parent="@android:style/Theme.Material.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+    
 </resources>

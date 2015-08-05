@@ -7,7 +7,9 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
 import java.util.List;
 
@@ -22,15 +24,30 @@ public class PreferenceWithHeaders extends PreferenceActivity {
             button.setText("Some action");
             setListFooter(button);
         }
+        
+        addPreferencesFromResource(R.xml.advanced_preferences);
     }
 
     /**
      * Populate the activity with the top-level headers.
      */
+//    @Override
+//    public void onBuildHeaders(List<Header> target) {
+//        loadHeadersFromResource(R.xml.preference_headers, target);
+//    }
+    
     @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.preference_headers, target);
+    public void onResume() {
+        super.onResume();
+        ListView list = (ListView) findViewById(android.R.id.list);
+        
+        if(list != null){
+            list.setPadding(0, 0, 0, 0);
+            list.setDivider(null);
+        }
     }
+
+    
 
     @Override
     protected boolean isValidFragment(String fragmentName) {
@@ -61,8 +78,12 @@ public class PreferenceWithHeaders extends PreferenceActivity {
                 Preference preference) {
             // TODO Auto-generated method stub
             Log.d("yanjun","onPreferenceTreeClick...");
+            preference.setEnabled(false);
             return super.onPreferenceTreeClick(preferenceScreen, preference);
+            
         }
+        
+       
     }
 
 //    /**

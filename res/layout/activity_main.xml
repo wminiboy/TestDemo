@@ -13,15 +13,56 @@
         android:onClick="onButtonClick"
         android:text="Button" />
 
-    <Button 
+    <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="50dp"
-        android:onClick="onButtonClick2"
         android:background="?android:attr/selectableItemBackground"
+        android:onClick="onButtonClick2"
         android:text="Button2" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginRight="50dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:onClick="onButtonClick3"
+        android:text="Button3" />
+
+    <com.example.testdemo.widget.CopyOfMySwitch
+        android:id="@+id/custom_switch_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="4dp"
+        android:background="@null"
+        android:gravity="center_vertical"
+        android:switchMinWidth="0dp"
+        android:textColor="@android:color/white"
+        android:textIsSelectable="false"
+        android:textOff=""
+        android:textOn=""
+        android:textSize="10sp"
+        android:thumb="@drawable/bg_check_box_circle"
+        android:track="@drawable/switch_track_selector" />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:checked="true"
+        android:enabled="false" />
+
+    <com.example.testdemo.widget.SlidingButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/custom_switch_item"
+        />
 
 </RelativeLayout>

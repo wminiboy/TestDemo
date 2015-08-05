@@ -11,9 +11,15 @@
         
         <SwitchPreference  android:key="switch_preference"
                 android:title="Test"
-                android:summary="Test haha " />
+                android:summary="Test haha " 
+                android:widgetLayout="@layout/custom_switch"
+                />
 
     </PreferenceCategory>
-
+    
+    <com.example.testdemo.CustomPreference
+        android:key="custome"
+		android:title="Test2"
+        android:summary="Test haha "/>
 
 </PreferenceScreen>
