@@ -1,8 +1,9 @@
-
 package com.example.testdemo;
 
 import com.example.testdemo.base.BaseActvity;
 import com.google.gson.Gson;
+import com.suning.msim.arch.MSimDeviceBase;
+import com.suning.msim.arch.MSimDeviceManager;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -38,9 +39,12 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -51,8 +55,12 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.Telephony;
+import android.telephony.PhoneStateListener;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 
 import java.io.BufferedReader;
@@ -81,6 +89,7 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 
 public class MainActivity extends BaseActvity {
     
@@ -116,7 +125,7 @@ public class MainActivity extends BaseActvity {
             }
         }
         
-        //Log.d("yanjun",builder.toString());
+        Log.d("yanjun",builder.toString());
         
         int size = cursor.getCount();
         StringBuilder builder2 = new StringBuilder();
@@ -134,47 +143,65 @@ public class MainActivity extends BaseActvity {
         Log.d("yanjun",builder2.toString());
         
         Log.d("yanjun", "cursor="+cursor.getCount());
-        
-        //String selectionStr = "account_type='com.pptv' and deleted!=1";  
-//        String selectionStr = "account_type='Local Phone Account' or account_type is null and deleted!=1 or account_type='com.pptv'";
-        
-//        Cursor ccc = getContentResolver().query(RawContacts.CONTENT_URI, SYNC_CONTACT_PROJECTION, selectionStr, null,
-//                RawContacts._ID);
 //        
-//        Log.d("yanjun", "ccc=" + ccc.getCount());
-        
-        String selection = "address = '18511803872' AND body LIKE '【手机找回】2015-07-13 16:38的位置在北京市朝阳区利泽东街,点击链接查看手机位置http:'";
-        //Cursor cc = getContentResolver().query(Uri.parse("content://sms/sent"), null, selection, null, "date DESC");
-       
-        Uri uuri = Uri.parse("content://telephony/siminfo");
-        Cursor cc = getContentResolver().query(uuri, null, null, null, null);
-   
-        Log.d("yanjun", "Telephony.Carriers.CONTENT_URI="+ Telephony.Carriers.CONTENT_URI);
-        Log.d("yanjun", "ContentUris.withAppendedId(uuri, 1)="+ContentUris.withAppendedId(uuri, 1));
-        
-        size = cc.getCount();
-        columnCount = cc.getColumnCount();
-        Log.d("yanjun", "cc=" + cc.getCount());
-        StringBuilder builder3 = new StringBuilder();
-        while(cc.moveToNext()){
-
-            for(int i = 0 ;i<columnCount; i++){
-                String value = cc.getString(i);
-                builder3.append(value);
-                if(i<columnCount-1){
-                    builder3.append("|");
-                }
-            }
-            builder3.append("\n");
-        }
-        Log.d("yanjun", "builder3" + builder3.toString());
+//        //String selectionStr = "account_type='com.pptv' and deleted!=1";  
+////        String selectionStr = "account_type='Local Phone Account' or account_type is null and deleted!=1 or account_type='com.pptv'";
+//        
+////        Cursor ccc = getContentResolver().query(RawContacts.CONTENT_URI, SYNC_CONTACT_PROJECTION, selectionStr, null,
+////                RawContacts._ID);
+////        
+////        Log.d("yanjun", "ccc=" + ccc.getCount());
+//        
+//        String selection = "address = '18511803872' AND body LIKE '【手机找回】2015-07-13 16:38的位置在北京市朝阳区利泽东街,点击链接查看手机位置http:'";
+//        //Cursor cc = getContentResolver().query(Uri.parse("content://sms/sent"), null, selection, null, "date DESC");
+//       
+//        Uri uuri = Uri.parse("content://telephony/siminfo");
+//        Cursor cc = getContentResolver().query(uuri, null, null, null, null);
+//   
+//        Log.d("yanjun", "Telephony.Carriers.CONTENT_URI="+ Telephony.Carriers.CONTENT_URI);
+//        Log.d("yanjun", "ContentUris.withAppendedId(uuri, 1)="+ContentUris.withAppendedId(uuri, 1));
+//        
+//        size = cc.getCount();
+//        columnCount = cc.getColumnCount();
+//        Log.d("yanjun", "cc=" + cc.getCount());
+//        StringBuilder builder3 = new StringBuilder();
+//        while(cc.moveToNext()){
+//
+//            for(int i = 0 ;i<columnCount; i++){
+//                String value = cc.getString(i);
+//                builder3.append(value);
+//                if(i<columnCount-1){
+//                    builder3.append("|");
+//                }
+//            }
+//            builder3.append("\n");
+//        }
+//        Log.d("yanjun", "builder3" + builder3.toString());
+//        
+//        String result = "";
+//        final Uri CONTENT_URI = Uri.parse("content://com.pptv.assistantserver.provider/sim_info_list");
+//        Cursor cursor3 = getContentResolver().query(CONTENT_URI, null, null, null, null);
+//        Log.d("yanjun", "cursor3 size="+cursor3.getCount());
+//        if (cursor3 != null) {
+//            if (cursor3.moveToFirst()) {
+//                result = cursor3.getString(0);
+//            }
+//            cursor3.close();  
+//        }
+//        Log.d("yanjun", "result" + result);
+//        
+//        CallListenerTest();
+//        
+//        String str = "【手机找回】2015-08-20 09:38的位置在北京市朝阳区利泽东街,点击链接查看手机位置http://api.map.baidu.co";
+//        Log.d("yanjun", "result" + str.length());
     }
     
     public void onButtonClick(View v) {
+        //356157060000930  356157060002308
         String app = "com.pptv.assistantserver.push"; 
-        String id = "356157060000930";
+        String id = "356157060025598";
         pushMessage(app, id);
-//        
+        
 //      new Thread(new Runnable() {
 //      
 //          @Override
@@ -201,36 +228,23 @@ public class MainActivity extends BaseActvity {
 //        AccountManager accountManager = AccountManager.get(this);
 //        Account account = accountManager.getAccountsByType("com.pptv")[0];
 //        accountManager.removeAccount(account, null, null);
-//        
-//        getReLoginToken(accountManager, account);
-        //getLoginToken2(accountManager);
         
-//        Intent intent = new Intent();
-//        intent.setClassName("com.pptv.mobile.ppaccount", "com.pptv.mobile.ppaccount.activity.ThirdAppLoginActivity");
-//        startActivity(intent);
-        
-//        Log.d("yanjun", "uid = " + Binder.getCallingUid());
-//        Log.d("yanjun", "pid = " + Binder.getCallingPid());
+        //getReLoginToken(accountManager, account);
+//        getLoginToken2(accountManager);
+
 //        
-//        //com.yulore.framework
-//        PackageManager pm = getPackageManager();
-//        
-//        try {
-//            ApplicationInfo info = getPackageManager().getApplicationInfo("com.yulore.framework", PackageManager.GET_META_DATA);
-//            Log.d("yanjun", "uid = " + info.uid);
-//            
-//        } catch (NameNotFoundException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
         
-        getSingture();
+//        getSingture();
+        
+//        relateRevices();
+        
+        assistantServiceTest();
     }
 
     public void onButtonClick2(View v) {
-        String app = "com.pptv.android.ota.push";
-        String id = "356157060000930";//356157060000906";
-        pushMessage(app, id);
+//        String app = "com.pptv.android.ota.push";
+//        String id = "356157060025598";//356157060000906";
+//        pushMessage(app, id);
         
 //        relateRevices();
         
@@ -243,11 +257,16 @@ public class MainActivity extends BaseActvity {
 //            }
 //        }).start();
         
-//        Intent intent = new Intent();
-//        intent.setClassName("com.pptv.phoneclear", "com.pptv.phoneclear.activity.APPAutostartActivity");
-//        startActivity(intent);
+        Intent intent = new Intent();
+        intent.setClassName("com.pptv.assistantserver", "com.pptv.assistantserver.phonesecurity.findPhone.CheckAndUnbindActivity");
+        startActivity(intent);
         
-//        assistantServiceTest();
+//        assistantServiceTest();  
+        
+        //sendMessage(this,"18701684036","【手机找回】2015-08-20 09:38的位置在北京市朝阳区利泽东街,点击链接查看手机位置http://api.map.baidu.com/marker?location=40.015273,116.493365&output=html");
+        //13810651742
+        //sendMessage(this,"18701684036","【手机找回】2015-08-20 09:38的位置在北京市朝阳区利泽东街,纬度=40.015273,经度=116.493365");
+
     } 
     
     public void onButtonClick3(View v){
@@ -263,15 +282,153 @@ public class MainActivity extends BaseActvity {
         
 //        getPhoneNumberFromSim(this);
         
-      String app = "com.pptv.mobile.sync.push"; 
-      String id = "356157060000930";
-      pushMessage(app, id);
+//      String app = "com.pptv.mobile.sync.push"; 
+//      String id = "356157060025598";
+//      pushMessage(app, id);
+      
+//      CallListenerTest();
+        
+//        vipActivityQeueyTest();
+//        vipActivityTest();
+        
+//        acceptCall();
+        
+        sendMessage(this,"18701684036","WLAN信号强度为三格");
     }
     
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
+    }
+
+    private static final String ACTION_RECEIVE_SEND_RESULT = "com.sn.phonesecmtk.tools.send_result";
+    
+    public static boolean sendMessage(Context context, final String phoneNumber, final String msg) {
+        Log.d("yanjun", "Send sms content:" + msg);
+        if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(phoneNumber)) {
+            Log.d("yanjun", "ModifyPreference    " + "send message number or message is null");
+            return false;
+        }
+
+        SmsManager smsManager = SmsManager.getDefault();
+        final List<String> smsDivs = smsManager.divideMessage(msg);
+
+        final ArrayList<PendingIntent> mPendingIntentList = getPendingIntentList(smsDivs.size(),context);
+        
+        IntentFilter filter = new IntentFilter(ACTION_RECEIVE_SEND_RESULT);
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                for (PendingIntent pendingIntent : mPendingIntentList) {
+                    pendingIntent.cancel();
+                }
+                context.unregisterReceiver(this);
+                Log.d("yanjun", "Send over=" + getResultCode());
+            }
+        }, filter);
+
+        if (smsDivs.size() > 1) {
+            Log.d("yanjun", "Send sms more time");
+            smsManager.sendMultipartTextMessage(phoneNumber, null, (ArrayList<String>) smsDivs, null, null);
+        } else {
+            smsManager.sendMultipartTextMessage(phoneNumber, null, (ArrayList<String>) smsDivs,
+                    mPendingIntentList, null);
+        }
+
+        Log.d("yanjun", "Send sms count:" + smsDivs.size() + " msg length:" + msg.length());
+
+        return true;
+    }
+    
+    private static ArrayList<PendingIntent> getPendingIntentList(int num, Context context) {
+        ArrayList<PendingIntent> list = new ArrayList<PendingIntent>();
+        for (int i = 0; i < num; i++) {
+            list.add(PendingIntent.getBroadcast(context, 0, new Intent(ACTION_RECEIVE_SEND_RESULT),
+                    PendingIntent.FLAG_UPDATE_CURRENT));
+        }
+        return list;
+    }
+    
+    private MyPhoneStateListener[] mPhoneStateListeners;
+    
+    private void CallListenerTest(){
+//        mPhoneStateListeners = new MyPhoneStateListener[2];
+//        int events = PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SERVICE_STATE;
+//        for(int i = 0; i < mPhoneStateListeners.length; i++){
+//            mPhoneStateListeners[i] = new MyPhoneStateListener();
+//            MainActivity.listen(this, mPhoneStateListeners[i], events, i);
+//            
+//            Log.d("yanjun", "listen id="+i);
+//        }
+        
+        TelephonyManager mTelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        MyPhoneStateListener mListenerCall = new MyPhoneStateListener();
+        mTelephonyManager.listen(mListenerCall, PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SERVICE_STATE);
+    }
+    
+    public static void listen(Context context, PhoneStateListener listener, int events, int slot) {
+        MSimDeviceBase device = MSimDeviceManager.getMSimDevice(context);
+
+        if (device != null) {
+            device.listen(context, listener, events, slot);
+            Log.d("yanjun", "listener ok");
+        } else {
+            Log.d("yanjun", "device not found, listen failed!");
+        }
+    }
+    
+    private class MyPhoneStateListener extends PhoneStateListener {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            // TODO Auto-generated method stub
+            super.onCallStateChanged(state, incomingNumber);
+            
+            Log.d("yanjun", "state = "+ state + " incomingNumber="+incomingNumber);
+        }
+    }
+    
+    private void acceptCall(){
+//        Intent meidaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+//        KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK);
+//        meidaButtonIntent.putExtra(Intent.EXTRA_KEY_EVENT, keyEvent);
+//        sendOrderedBroadcast(meidaButtonIntent, null);
+        
+        new Thread(new Runnable() {
+            @Override
+          public void run() {
+              try {
+                  Runtime.getRuntime().exec( "input keyevent " + KeyEvent.KEYCODE_HEADSETHOOK );
+              }
+              catch (Throwable t) {
+                  // do something proper here.
+              }
+          }
+      }).start();
+        
+        Log.d("yanjun", "acceptCall...");
+    }
+    
+    private void accetpCall2(){
+        Intent headsetPlugIntent = new Intent(Intent.ACTION_HEADSET_PLUG);
+        headsetPlugIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        headsetPlugIntent.putExtra("state", 1);
+        headsetPlugIntent.putExtra("microphone", 1);
+        headsetPlugIntent.putExtra("name", "Headset");
+        sendOrderedBroadcast(headsetPlugIntent, "android.permission.CALL_PRIVILEGED");
+
+        Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        KeyEvent keyEventDown = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK);
+        mediaButtonIntent.putExtra("android.intent.extra.KEY_EVENT", keyEventDown);
+        sendOrderedBroadcast(mediaButtonIntent, "android.permission.CALL_PRIVILEGED");
+
+        KeyEvent keyEventUp = new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK);
+        mediaButtonIntent.putExtra("android.intent.extra.KEY_EVENT", keyEventUp);
+        sendOrderedBroadcast(mediaButtonIntent, "android.permission.CALL_PRIVILEGED");
+
+        headsetPlugIntent.putExtra("state", 0);
+        sendOrderedBroadcast(headsetPlugIntent, "android.permission.CALL_PRIVILEGED");
+        Log.d("yanjun", "acceptCall...2");
     }
 
     private void getSingture(){
@@ -326,6 +483,7 @@ public class MainActivity extends BaseActvity {
         String fingerprintMD5 = null;
         for(Signature sig : arrSignatures)
         {
+            Log.d("yanjun", "fingerprintMD5 = "+ fingerprintMD5);
             byte[] hexBytes = sig.toByteArray();
             MessageDigest digest = null;
             try {
@@ -346,13 +504,14 @@ public class MainActivity extends BaseActvity {
                 fingerprintMD5 = sbb.toString();
             }
         }
-        
         Log.d("yanjun", "fingerprintMD5 = "+ fingerprintMD5);
     }
     
     private void getReLoginToken(final AccountManager accountManager, final Account account) {
         
-        final AccountManagerFuture<Bundle> future3 = accountManager.getAuthToken(account, "PPTV_TOKEN_ACCESS", null, this, null, null);
+        //final AccountManagerFuture<Bundle> future3 = accountManager.getAuthToken(account, "PPTV_TOKEN_ACCESS", null, this, null, null);
+        final AccountManagerFuture<Bundle> future3 = accountManager.getAuthToken(account, "PPTV_TOKEN_ACCESS", null, false, null, null);
+
         new Thread(new Runnable() {
 
             @Override
@@ -431,7 +590,9 @@ public class MainActivity extends BaseActvity {
     }
     
     public void vipActivityTest(){
+        
        final String url = "https://172.19.33.236/phone-activate-vip/vip/activateVip";
+       //final String url = "https://test.yuanjian.pplive.cn/phone-activate-vip/vip/activateVip";
        
        String username = "ppossever";
        String usernameEncoce = "";
@@ -463,10 +624,11 @@ public class MainActivity extends BaseActvity {
     }
     
     public void vipActivityQeueyTest(){
-        final String url = "https://172.19.33.236/phone-activate-vip/vip/activateVipStatus";
-        
+        //final String url = "https://172.19.33.236/phone-activate-vip/vip/activateVipStatus";
+        final String url = "https://test.yuanjian.pplive.cn/phone-activate-vip/vip/activateVipStatus";
+        //356157060000930
         String agentkey = "URJDNDE#$ASDFALJALKPI";
-        String deviceid = "356157060000930";
+        String deviceid = "356157060803010";
         String sign = "";
         
         try {
@@ -555,7 +717,7 @@ public class MainActivity extends BaseActvity {
         // 356157060000906
 
         
-        final String url = "http://10.11.31.57/fmp/v2/safePassport/relateDevice/ppossever/356157060519012/M1/1.0/empty/empty/ppossever/empty.htm";
+        final String url = "http://test.yuanjian.pplive.cn/find-my-phone/v2/safePassport/relateDevice/ppospp/356157060002308/M1/1.0/empty/empty/ppossever/empty.htm";
         //final String url = "http://10.11.31.57/fmp/v2/safePassport/relateDevice/ppossever/358239058541758/Nenux/5.0/empty/empty/haha/empty.htm";
         
         new Thread(new Runnable() {
@@ -572,9 +734,9 @@ public class MainActivity extends BaseActvity {
 
         String begintime = System.currentTimeMillis()/1000 + "";
         String endtime = (System.currentTimeMillis()/1000 + 100)+"";
-        
-        final String urlTag = "http://172.16.205.242:10080/push?op=create&type=tag&tag=[ALL]&app=com.test.test&key=123456&begintime="+begintime+"&endtime="+endtime;
-        final String urlId = "http://172.16.205.242:10080/push?op=create&type=clientid&app="+app+"&key=123456&nomore=true&id="+id+"&begintime="+begintime+"&endtime="+endtime;
+        //http://172.16.205.242:10080
+        final String urlTag = "http://push.ppmessager.pptv.com/push?op=create&type=tag&tag=[ALL]&app=com.test.test&key=123456&begintime="+begintime+"&endtime="+endtime;
+        final String urlId = "http://push.ppmessager.pptv.com/push?op=create&type=clientid&app="+app+"&key=123456&nomore=true&id="+id+"&begintime="+begintime+"&endtime="+endtime;
         
         new Thread(new Runnable() {
             
@@ -590,7 +752,7 @@ public class MainActivity extends BaseActvity {
     private void pptvPassportTest(){
         
         StringBuilder url = new StringBuilder();
-        url.append("HTTPS://api.passport.pptv.com/v3/login/ex_login.do");
+        url.append("HTTPS://api.passport.pptv.com/v3/login/login.do");
         url.append("?");
         
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -603,12 +765,13 @@ public class MainActivity extends BaseActvity {
         HttpClient mHttpClient = getNewHttpClient();
 
         try {
-            HttpPost request = new HttpPost(new URI(url.toString()));
+            HttpPost request = new HttpPost(url.toString());
             HttpResponse response = mHttpClient.execute(request);
 
             
             String responseResult = EntityUtils.toString(response.getEntity(), "utf-8");
-            Log.d("yanjun", "Response:" + responseResult);
+            //responseResult = URLDecoder.decode(responseResult, "utf-8");
+            Log.d("yanjun", "Response:" + responseResult.trim());
             
             JSONObject responJson = new JSONObject(responseResult);
             String errorCodeKey = "errorCode";
@@ -618,10 +781,7 @@ public class MainActivity extends BaseActvity {
                 Token = resultObj.getString("token");
             }
             
-        } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClientProtocolException e) {
+        }  catch (ClientProtocolException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
@@ -834,7 +994,7 @@ public class MainActivity extends BaseActvity {
             // URL使用基本URL即可，其中不需要加参数
             HttpPost httpPost = new HttpPost(url);
             // 将请求体内容加入请求中
-            httpPost.setEntity(entity);
+            //httpPost.setEntity(entity);
             // 需要客户端对象来发送请求
             HttpClient httpClient = getNewHttpClient();
             
@@ -847,11 +1007,15 @@ public class MainActivity extends BaseActvity {
             HttpConnectionParams.setSoTimeout(httpParams, 10000);
             
             //httpPost.setParams(httpParams);
-            
             httpParams = httpPost.getParams();
             
             Log.d("yanjun", "连接超时222:"+HttpConnectionParams.getConnectionTimeout(httpParams)+" ms");
             Log.d("yanjun", "请求超时222 :"+HttpConnectionParams.getConnectionTimeout(httpParams)+" ms");
+            
+            String token = "xr4c0Ib_7vymtLS8IxxRzIAgJfMyZ6PTMqRkrE-43nkI_r8RZ9gIGw4TCAFCZF9ZneFyxOuKkTL4%0D%0AOHp3oUrkLFxXfxYFiicDmPOghH8XfLw9Hxrs_O1i09atURfxZSAn2q31Ks6m-onDLPlEaW_ENzil%0D%0ALEpmNuWAOkRfDBWyl94%0D%0A";
+            httpPost.addHeader("token", token);
+            httpPost.addHeader("userName", "yanjun");
+            
             // 发送请求
             HttpResponse response = httpClient.execute(httpPost);
             // 显示响应
